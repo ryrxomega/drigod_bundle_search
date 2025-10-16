@@ -97,28 +97,74 @@ Property-based tests are mandatory for complex logic. Each BC must have property
 
 ## 5. Task Implementation Workflow
 
-Follow this multi-persona workflow for every task.
+Every task, from a new feature to a bug fix, MUST follow this structured, multi-persona workflow. This ensures that work is thoroughly understood, planned, documented, and executed to the highest standard. The use of `AICODE-` comment prefixes is mandatory throughout this process.
 
-### Phase 0: Domain Understanding
-Before planning, ensure complete understanding of fashion terminology, CIELCh, beam search, and CQRS patterns.
+### Phase 0: Domain Understanding & Initial Scoping
+Before any planning documents are created, a foundational understanding must be established.
+1.  **Objective:** Absorb the core concepts relevant to the task.
+2.  **Actions:**
+    *   Review the project `README.md` and `AGENTS.md` (this document).
+    *   Study the specific domain model, including fashion terminology (Fashionpedia), color science (CIELCh), algorithms (beam search), and architecture (CQRS).
+    *   Use codebase search tools (`rg`, `sg`) to identify existing code related to the task. **Crucially, search for existing `AICODE-` comments** (`rg "AICODE-"`) to understand previous developer intent, pending tasks, or important notes.
 
 ### Phase 1: Product Analysis (Product Manager Persona)
-Define the "what" and "why" of the task, user stories, and acceptance criteria in a temporary `product_brief_temp.md`.
+Define the "what" and the "why" of the task.
+1.  **Objective:** Frame the problem from a user and business perspective.
+2.  **Actions:**
+    *   Create a temporary file named `product_brief_temp.md`.
+    *   In this file, clearly define:
+        *   **User Stories:** Who are the users and what do they want to achieve?
+        *   **Acceptance Criteria:** How will we know when the feature is complete and correct?
+        *   **Business Goal:** Why is this task important for the product?
 
 ### Phase 2: Developer Briefing (Technical Lead Persona)
-Outline the technical approach, challenges, and affected codebase areas in a `brief_temp.md`.
+Translate the product requirements into a high-level technical strategy.
+1.  **Objective:** Outline a feasible technical approach.
+2.  **Actions:**
+    *   Create a temporary file named `brief_temp.md`.
+    *   In this file, outline:
+        *   **Proposed Solution:** A high-level description of the implementation.
+        *   **Affected Systems:** Which Bounded Contexts, modules, or services will be touched?
+        *   **Potential Challenges & Risks:** What are the known unknowns or potential blockers?
 
 ### Phase 3: Granular Planning (Senior Developer Persona)
-Create a detailed, step-by-step checklist in a `todo_temp.md`.
+Break down the high-level strategy into an executable, step-by-step plan.
+1.  **Objective:** Create a detailed checklist that a junior developer could follow.
+2.  **Actions:**
+    *   Create a temporary file named `todo_temp.md`.
+    *   Break down the technical brief into an extremely granular list of actions. Each item should be a small, verifiable change.
+    *   **Incorporate `AICODE-` planning:** For complex logic, add steps in your `todo_temp.md` to first write out the plan using `AICODE-PSEUDO` or `AICODE-MATH` comments directly in the target source file before writing the actual code.
 
 ### Phase 4: Implementation & Verification (Senior Python Developer Persona)
-Execute the plan from `todo_temp.md`, adhering strictly to TDD. Continuously verify with quality checks.
+Execute the plan with discipline and continuous verification. This is the core coding phase.
+1.  **Objective:** Implement the solution according to the plan, adhering to all quality standards.
+2.  **Actions:**
+    *   **Search First:** Before modifying any file, search it again for any `AICODE-` comments that provide context or constraints.
+    *   **Execute the Plan:** Follow your `todo_temp.md` step-by-step.
+    *   **TDD Cycle:** Adhere strictly to the "Red-Green-Refactor" cycle for all code changes.
+    *   **Document As You Go:** This is critical. **Use `AICODE-` comments extensively** to document your process *in the code itself*.
+        *   Use `AICODE-NOTE` to explain a tricky part of the code or an assumption you made.
+        *   Use `AICODE-TODO` to mark something that needs to be revisited.
+        *   Write `AICODE-PSEUDO` or `AICODE-MATH` blocks *before* implementing their corresponding logic. This serves as your implementation blueprint.
+    *   **Continuous Verification:** After each significant change, run the quality gates:
+        *   Tests & Coverage: `coverage run -m pytest && coverage report`
+        *   Code Health: `ruff check . && mypy . && radon cc . -a -nc`
 
 ### Phase 5: Performance Optimization
-After implementation, profile to identify bottlenecks, apply optimizations (caching, query tuning), and verify P95 targets are met.
+After the feature is functionally complete, ensure it meets performance SLOs.
+1.  **Objective:** Validate and optimize the performance of the new code.
+2.  **Actions:**
+    *   **Profile:** Run the performance benchmark suite to identify any new bottlenecks.
+    *   **Optimize:** Apply targeted optimizations (e.g., query tuning, caching, algorithmic improvements).
+    *   **Verify:** Re-run benchmarks to confirm that P95 latency targets are met without introducing regressions.
 
 ### Phase 6: Observability Setup
-Implement required metrics, distributed tracing, and structured logging.
+Ensure the new feature is monitorable and supportable in production.
+1.  **Objective:** Instrument the code for effective monitoring and debugging.
+2.  **Actions:**
+    *   **Metrics:** Add or update metrics for key operations (e.g., latency, error rates, bundle_found_rate).
+    *   **Tracing:** Ensure new operations are included in the distributed trace by adding relevant spans.
+    *   **Logging:** Add structured logs for important events, decisions, or errors.
 
 ### The Code Review Scorecard
 This scorecard must be completed and included in the body of every commit message.
